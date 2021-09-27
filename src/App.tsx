@@ -1,26 +1,69 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React from 'react'
+import { createForm, ArrayField } from '@formily/core'
+import {
+  FormProvider,
+  createSchemaField,
+  RecursionField,
+  useField,
+  useFieldSchema,
+  observer,
+} from '@formily/react'
+import { Input, Space, Button } from 'antd';
+import 'antd/dist/antd.css';
 
-function App() {
+const form = createForm()
+
+const ArrayItems = observer((props: any) => {
+  const field = useField<ArrayField>()
+  const schema = useFieldSchema()
+  if (!schema) throw new Error('can not found schema object')
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div>
+      {props.value?.map((item: any, index: any) => {
+        const items: any = Array.isArray(schema.items)
+        ? schema.items[index] || schema.items[0]
+        : schema.items
+        return (
+          <div key={index} style={{ marginBottom: 10 }}>
+            <Space>
+              <RecursionField schema={items} name={index} />
+              <Button
+                onClick={() => {
+                  field.remove(index)
+                }}
+              >
+                Remove
+              </Button>
+            </Space>
+          </div>
+        )
+      })}
+      <Button
+        onClick={() => {
+          field.push({})
+        }}
+      >
+        Add
+      </Button>
     </div>
-  );
-}
+  )
+})
 
-export default App;
+const SchemaField = createSchemaField({
+  components: {
+    ArrayItems,
+    Input,
+  },
+})
+
+export default () => (
+  <FormProvider form={form}>
+    <SchemaField>
+      <SchemaField.Array name="custom" x-component="ArrayItems">
+        <SchemaField.Object>
+          <SchemaField.String name="input" x-component="Input" />
+        </SchemaField.Object>
+      </SchemaField.Array>
+    </SchemaField>
+  </FormProvider>
+)

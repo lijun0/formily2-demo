@@ -4,6 +4,12 @@ import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 
+// 把React.StrictMode去掉就可以渲染了
+// ReactDOM.render(
+//     <App />,
+//     document.getElementById('root')
+// );
+
 ReactDOM.render(
   <React.StrictMode>
     <App />
